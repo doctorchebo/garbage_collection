@@ -1,0 +1,10 @@
+.comboboxInput {
+  width: 100%;
+  padding: 0.5rem;
+}
+
+.comboboxOption {
+  background-color: white;
+  text-decoration: none;
+}
+
