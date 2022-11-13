@@ -4,8 +4,8 @@
 }
 .placesContainer {
   position: absolute;
-  top: 10px;
-  left: 50%;
+  top: 80px;
+  left: 12%;
   transform: translateX(-50%);
   z-index: 10;
   width: 300px;
