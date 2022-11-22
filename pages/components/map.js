@@ -16,6 +16,7 @@ import SearchForm from "./searchForm";
 import NavBar from "./navBar";
 import SideBar from "./sideBar";
 import Distance from "./distance";
+import { Combobox, ComboboxButton } from "@reach/combobox";
 function Map() {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_API_KEY,
@@ -23,14 +24,12 @@ function Map() {
   });
   const [selected, setSelected] = useState(null);
   const [sideBar, setSideBar] = useState(false);
-  const [directions, setDirections] = useState();
+  const [directions, setDirections] = useState(null);
 
   const randomLocations = useMemo(
     () => generateLocations(selected),
     [selected]
   );
-
-  console.log(randomLocations);
 
   const options = useMemo(
     () => ({
@@ -42,6 +41,13 @@ function Map() {
   );
   const mapRef = useRef();
   const onLoad = useCallback((map) => (mapRef.current = map), []);
+  const onMarkerDragEnd = (event) => {
+    console.log("Called");
+    console.log(event);
+    const lat = event.latLng.lat();
+    const lng = event.latLng.lng();
+    setSelected({ lat, lng });
+  };
   const getDirections = (house) => {
     const service = new google.maps.DirectionsService();
     service.route(
@@ -52,10 +58,19 @@ function Map() {
       },
       (result, status) => {
         if (status === "OK" && result) {
+          console.log("result");
+          console.log(result);
           setDirections(result);
         }
       }
     );
+  };
+  const clearDirections = () => {
+    setDirections();
+  };
+  const saveMarker = (event) => {
+    console.log(event);
+    console.log("Save marker");
   };
   if (!isLoaded) {
     return <Box>Loading...</Box>;
@@ -73,6 +88,13 @@ function Map() {
             mapRef.current.panTo(pos);
           }}
         />
+        {directions && (
+          <Combobox>
+            <ComboboxButton onClick={() => clearDirections()}>
+              Clean
+            </ComboboxButton>
+          </Combobox>
+        )}
       </div>
       {/* <SearchForm setZoom={setZoom} /> */}
       <GoogleMap
@@ -81,6 +103,8 @@ function Map() {
         mapContainerClassName={styles.map}
         options={options}
         onLoad={onLoad}
+        clickable={true}
+        onClick={saveMarker}
       >
         {directions && (
           <DirectionsRenderer
@@ -96,7 +120,13 @@ function Map() {
         )}
         {selected && (
           <>
-            <MarkerF position={selected} icon="/b.png" />
+            <MarkerF
+              position={selected}
+              icon="/b.png"
+              draggable={true}
+              onDragEnd={onMarkerDragEnd}
+              clickable={true}
+            />
             <MarkerClusterer>
               {(clusterer) =>
                 randomLocations.map((house) => (

@@ -10,3 +10,8 @@
   z-index: 10;
   width: 300px;
 }
+
+.button {
+  width:80px;
+  height:30px;
+}
