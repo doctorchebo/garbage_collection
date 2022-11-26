@@ -28,7 +28,7 @@ function Map() {
   const [directions, setDirections] = useState(null);
   const [saveButton, setSaveButton] = useState(false);
   const [locations, setLocations] = useState([]);
-  const [customMarker, setCustomMarker] = useState();
+  const [isSearch, setIsSearch] = useState(false);
   console.log(locations);
   const randomLocations = useMemo(
     () => generateLocations(selected),
@@ -46,9 +46,13 @@ function Map() {
   const mapRef = useRef();
   const onLoad = useCallback((map) => (mapRef.current = map), []);
   const onMarkerDragEnd = (event) => {
+    setIsSearch((prev) => false);
     const lat = event.latLng.lat();
     const lng = event.latLng.lng();
-    setSelected({ lat, lng });
+    setSelected({
+      lat,
+      lng,
+    });
   };
   const getDirections = (house) => {
     const service = new google.maps.DirectionsService();
@@ -74,13 +78,14 @@ function Map() {
     console.log(event);
     const lat = event.latLng.lat();
     const lng = event.latLng.lng();
-    setCustomMarker({ lat, lng });
+    setIsSearch(false);
+    setSelected({ lat, lng });
     setSaveButton(true);
   };
 
   const saveLocation = () => {
     console.log("saving");
-    setLocations([...locations, customMarker]);
+    setLocations([...locations, selected]);
     console.log("saved");
   };
   if (!isLoaded) {
@@ -102,6 +107,7 @@ function Map() {
         )}
         <PlacesAutocomplete
           setSelected={(pos) => {
+            setIsSearch(true);
             setSelected(pos);
             mapRef.current.panTo(pos);
           }}
@@ -117,7 +123,7 @@ function Map() {
       {/* <SearchForm setZoom={setZoom} /> */}
       <GoogleMap
         zoom={15}
-        center={selected}
+        center={isSearch && selected}
         mapContainerClassName={styles.map}
         options={options}
         onLoad={onLoad}
