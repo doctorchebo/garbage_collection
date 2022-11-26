@@ -17,7 +17,8 @@ import NavBar from "./navBar";
 import SideBar from "./sideBar";
 import Distance from "./distance";
 import { Combobox, ComboboxButton } from "@reach/combobox";
-function Map() {
+import SnackBar from "./snackBar";
+function Map({ dark, setDark }) {
   const [libraries] = useState(["places"]);
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_API_KEY,
@@ -29,6 +30,7 @@ function Map() {
   const [saveButton, setSaveButton] = useState(false);
   const [locations, setLocations] = useState([]);
   const [isSearch, setIsSearch] = useState(false);
+  const [open, setOpen] = useState(false);
   console.log(locations);
   const randomLocations = useMemo(
     () => generateLocations(selected),
@@ -86,6 +88,7 @@ function Map() {
   const saveLocation = () => {
     console.log("saving");
     setLocations([...locations, selected]);
+    setOpen(true);
     console.log("saved");
   };
   if (!isLoaded) {
@@ -93,12 +96,17 @@ function Map() {
   }
   return (
     <>
-      <NavBar sideBar={sideBar} setSideBar={setSideBar} />
+      <NavBar
+        sideBar={sideBar}
+        setSideBar={setSideBar}
+        dark={dark}
+        setDark={setDark}
+      />
       <SideBar sideBar={sideBar} setSideBar={setSideBar} />
       <div className={styles.placesContainer}>
         {!selected && <p>Look for a place to clean</p>}
         {directions && <Distance leg={directions.routes[0].legs[0]} />}
-        {saveButton && (
+        {selected && (
           <Combobox>
             <ComboboxButton onClick={() => saveLocation()}>
               Save Location
@@ -166,6 +174,7 @@ function Map() {
           </>
         )}
       </GoogleMap>
+      <SnackBar open={open} setOpen={setOpen} />
     </>
   );
 }

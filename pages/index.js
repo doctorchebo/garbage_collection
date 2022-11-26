@@ -3,10 +3,10 @@ import Map from "./components/map";
 import NavBar from "./components/navBar";
 import SearchForm from "./components/searchForm";
 
-export default function Home() {
+export default function Home({ dark, setDark }) {
   return (
     <Box position="relative">
-      <Map />
+      <Map dark={dark} setDark={setDark} />
     </Box>
   );
 }
