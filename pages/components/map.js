@@ -18,14 +18,18 @@ import SideBar from "./sideBar";
 import Distance from "./distance";
 import { Combobox, ComboboxButton } from "@reach/combobox";
 function Map() {
+  const [libraries] = useState(["places"]);
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_API_KEY,
-    libraries: ["places"],
+    libraries,
   });
   const [selected, setSelected] = useState(null);
   const [sideBar, setSideBar] = useState(false);
   const [directions, setDirections] = useState(null);
-
+  const [saveButton, setSaveButton] = useState(false);
+  const [locations, setLocations] = useState([]);
+  const [customMarker, setCustomMarker] = useState();
+  console.log(locations);
   const randomLocations = useMemo(
     () => generateLocations(selected),
     [selected]
@@ -42,8 +46,6 @@ function Map() {
   const mapRef = useRef();
   const onLoad = useCallback((map) => (mapRef.current = map), []);
   const onMarkerDragEnd = (event) => {
-    console.log("Called");
-    console.log(event);
     const lat = event.latLng.lat();
     const lng = event.latLng.lng();
     setSelected({ lat, lng });
@@ -68,9 +70,18 @@ function Map() {
   const clearDirections = () => {
     setDirections();
   };
-  const saveMarker = (event) => {
+  const handleMapOnClick = (event) => {
     console.log(event);
-    console.log("Save marker");
+    const lat = event.latLng.lat();
+    const lng = event.latLng.lng();
+    setCustomMarker({ lat, lng });
+    setSaveButton(true);
+  };
+
+  const saveLocation = () => {
+    console.log("saving");
+    setLocations([...locations, customMarker]);
+    console.log("saved");
   };
   if (!isLoaded) {
     return <Box>Loading...</Box>;
@@ -82,6 +93,13 @@ function Map() {
       <div className={styles.placesContainer}>
         {!selected && <p>Look for a place to clean</p>}
         {directions && <Distance leg={directions.routes[0].legs[0]} />}
+        {saveButton && (
+          <Combobox>
+            <ComboboxButton onClick={() => saveLocation()}>
+              Save Location
+            </ComboboxButton>
+          </Combobox>
+        )}
         <PlacesAutocomplete
           setSelected={(pos) => {
             setSelected(pos);
@@ -104,7 +122,7 @@ function Map() {
         options={options}
         onLoad={onLoad}
         clickable={true}
-        onClick={saveMarker}
+        onClick={handleMapOnClick}
       >
         {directions && (
           <DirectionsRenderer
