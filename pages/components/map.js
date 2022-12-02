@@ -18,6 +18,7 @@ import SideBar from "./sideBar";
 import Distance from "./distance";
 import { Combobox, ComboboxButton } from "@reach/combobox";
 import SnackBar from "./snackBar";
+import ContextMenu from "./contextMenu";
 function Map({ dark, setDark }) {
   const [libraries] = useState(["places"]);
   const { isLoaded } = useLoadScript({
@@ -31,6 +32,7 @@ function Map({ dark, setDark }) {
   const [locations, setLocations] = useState([]);
   const [isSearch, setIsSearch] = useState(false);
   const [open, setOpen] = useState(false);
+  const [contextMenu, setContextMenu] = useState(null);
   console.log(locations);
   const randomLocations = useMemo(
     () => generateLocations(selected),
@@ -91,90 +93,108 @@ function Map({ dark, setDark }) {
     setOpen(true);
     console.log("saved");
   };
+
+  const handleContextMenu = (event) => {
+    setContextMenu(
+      contextMenu === null
+        ? {
+            mouseX: event.clientX + 2,
+            mouseY: event.clientY - 6,
+          }
+        : null
+    );
+  };
+
   if (!isLoaded) {
     return <Box>Loading...</Box>;
   }
   return (
     <>
-      <NavBar
-        sideBar={sideBar}
-        setSideBar={setSideBar}
-        dark={dark}
-        setDark={setDark}
-      />
-      <SideBar sideBar={sideBar} setSideBar={setSideBar} />
-      <div className={styles.placesContainer}>
-        {!selected && <p>Look for a place to clean</p>}
-        {directions && <Distance leg={directions.routes[0].legs[0]} />}
-        {selected && (
-          <Combobox>
-            <ComboboxButton onClick={() => saveLocation()}>
-              Save Location
-            </ComboboxButton>
-          </Combobox>
-        )}
-        <PlacesAutocomplete
-          setSelected={(pos) => {
-            setIsSearch(true);
-            setSelected(pos);
-            mapRef.current.panTo(pos);
-          }}
+      <div onContextMenu={handleContextMenu} style={{ cursor: "context-menu" }}>
+        <NavBar
+          sideBar={sideBar}
+          setSideBar={setSideBar}
+          dark={dark}
+          setDark={setDark}
         />
-        {directions && (
-          <Combobox>
-            <ComboboxButton onClick={() => clearDirections()}>
-              Clean
-            </ComboboxButton>
-          </Combobox>
-        )}
-      </div>
-      {/* <SearchForm setZoom={setZoom} /> */}
-      <GoogleMap
-        zoom={15}
-        center={isSearch && selected}
-        mapContainerClassName={styles.map}
-        options={options}
-        onLoad={onLoad}
-        clickable={true}
-        onClick={handleMapOnClick}
-      >
-        {directions && (
-          <DirectionsRenderer
-            directions={directions}
-            options={{
-              polylineOptions: {
-                strokeWeight: 5,
-                strokeColor: "#74DC4D",
-                zIndex: 50,
-              },
+        <SideBar sideBar={sideBar} setSideBar={setSideBar} />
+        <div className={styles.placesContainer}>
+          {!selected && <p>Look for a place to clean</p>}
+          {directions && <Distance leg={directions.routes[0].legs[0]} />}
+          {selected && (
+            <Combobox>
+              <ComboboxButton onClick={() => saveLocation()}>
+                Save Location
+              </ComboboxButton>
+            </Combobox>
+          )}
+          <PlacesAutocomplete
+            setSelected={(pos) => {
+              setIsSearch(true);
+              setSelected(pos);
+              mapRef.current.panTo(pos);
             }}
           />
-        )}
-        {selected && (
-          <>
-            <MarkerF
-              position={selected}
-              icon="/b.png"
-              draggable={true}
-              onDragEnd={onMarkerDragEnd}
-              clickable={true}
+          {directions && (
+            <Combobox>
+              <ComboboxButton onClick={() => clearDirections()}>
+                Clean
+              </ComboboxButton>
+            </Combobox>
+          )}
+        </div>
+        {/* <SearchForm setZoom={setZoom} /> */}
+        <GoogleMap
+          zoom={15}
+          center={isSearch && selected}
+          mapContainerClassName={styles.map}
+          options={options}
+          onLoad={onLoad}
+          clickable={true}
+          onClick={handleMapOnClick}
+        >
+          {directions && (
+            <DirectionsRenderer
+              directions={directions}
+              options={{
+                polylineOptions: {
+                  strokeWeight: 5,
+                  strokeColor: "#74DC4D",
+                  zIndex: 50,
+                },
+              }}
             />
-            <MarkerClusterer>
-              {(clusterer) =>
-                randomLocations.map((house) => (
-                  <MarkerF
-                    key={house.lat}
-                    position={house}
-                    clusterer={clusterer}
-                    onClick={() => getDirections(house)}
-                  />
-                ))
-              }
-            </MarkerClusterer>
-          </>
-        )}
-      </GoogleMap>
-      <SnackBar open={open} setOpen={setOpen} />
+          )}
+          {selected && (
+            <>
+              <MarkerF
+                position={selected}
+                icon="/b.png"
+                draggable={true}
+                onDragEnd={onMarkerDragEnd}
+                clickable={true}
+              />
+              <ContextMenu
+                contextMenu={contextMenu}
+                setContextMenu={setContextMenu}
+              />
+              <MarkerClusterer>
+                {(clusterer) =>
+                  randomLocations.map((house) => (
+                    <MarkerF
+                      key={house.lat}
+                      position={house}
+                      clusterer={clusterer}
+                      onClick={() => getDirections(house)}
+                    />
+                  ))
+                }
+              </MarkerClusterer>
+            </>
+          )}
+        </GoogleMap>
+        <SnackBar open={open} setOpen={setOpen} />
+      </div>
     </>
   );
 }
