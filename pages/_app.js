@@ -5,6 +5,8 @@ import * as React from "react";
 import { red } from "@mui/material/colors";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { useState } from "react";
+import { Provider } from "react-redux";
+import store from "../app/store";
 
 function MyApp({ Component, pageProps }) {
   const [dark, setDark] = useState(false);
@@ -25,9 +27,11 @@ function MyApp({ Component, pageProps }) {
       <Head>
         <link rel="shortcut icon" href={favicon.src} type="image/x-icon" />
       </Head>
-      <ThemeProvider theme={theme}>
-        <Component {...pageProps} dark={dark} setDark={setDark} />
-      </ThemeProvider>
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <Component {...pageProps} dark={dark} setDark={setDark} />
+        </ThemeProvider>
+      </Provider>
     </div>
   );
 }
