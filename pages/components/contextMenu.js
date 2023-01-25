@@ -7,7 +7,7 @@ export default function ContextMenu({ contextMenu, setContextMenu }) {
   console.log("contextMenu =>" + contextMenu);
   const handleClose = () => {
     setContextMenu(null);
-    saveMarkerInDB();
+    
   };
 
   return (

@@ -1,12 +1,13 @@
 import axios from "axios";
-export const axiosLocationsAPI = axios.create({
+export const locationsAPI = axios.create({
   baseUrl: "http://127.0.0.1:8000/locations/",
 });
 
-export const axiosAuthAPI = axios.create({
+export const authAPI = axios.create({
   baseUrl: "http://127.0.0.1:8000/auth/",
+  withCredentials: true,
 });
 
-export const axiosUsersAPI = axios.create({
+export const usersAPI = axios.create({
   baseUrl: "http://127.0.0.1:8000/users/",
 });
