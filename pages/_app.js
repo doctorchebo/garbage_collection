@@ -7,8 +7,10 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { useState } from "react";
 import { Provider } from "react-redux";
 import store from "../app/store";
+import NavBar from "./components/navBar";
 
 function MyApp({ Component, pageProps }) {
+  const [sideBar, setSideBar] = useState(false);
   const [dark, setDark] = useState(false);
   console.log(dark);
   const theme = createTheme({
@@ -29,7 +31,19 @@ function MyApp({ Component, pageProps }) {
       </Head>
       <Provider store={store}>
         <ThemeProvider theme={theme}>
-          <Component {...pageProps} dark={dark} setDark={setDark} />
+          <NavBar
+            sideBar={sideBar}
+            setSideBar={setSideBar}
+            dark={dark}
+            setDark={setDark}
+          />
+          <Component
+            {...pageProps}
+            dark={dark}
+            setDark={setDark}
+            sideBar={sideBar}
+            setSideBar={setSideBar}
+          />
         </ThemeProvider>
       </Provider>
     </div>

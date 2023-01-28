@@ -22,8 +22,10 @@
     "next": "12.3.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-hook-form": "^7.42.1",
     "react-redux": "^8.0.5",
-    "use-places-autocomplete": "^4.0.0"
+    "use-places-autocomplete": "^4.0.0",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "eslint": "8.24.0",

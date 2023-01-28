@@ -19,14 +19,13 @@ import Distance from "./distance";
 import { Combobox, ComboboxButton } from "@reach/combobox";
 import SnackBar from "./snackBar";
 import ContextMenu from "./contextMenu";
-function Map({ dark, setDark }) {
+function Map({ dark, setDark, sideBar, setSideBar }) {
   const [libraries] = useState(["places"]);
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_API_KEY,
     libraries,
   });
   const [selected, setSelected] = useState(null);
-  const [sideBar, setSideBar] = useState(false);
   const [directions, setDirections] = useState(null);
   const [saveButton, setSaveButton] = useState(false);
   const [locations, setLocations] = useState([]);
@@ -111,12 +110,6 @@ function Map({ dark, setDark }) {
   return (
     <>
       <div onContextMenu={handleContextMenu} style={{ cursor: "context-menu" }}>
-        <NavBar
-          sideBar={sideBar}
-          setSideBar={setSideBar}
-          dark={dark}
-          setDark={setDark}
-        />
         <SideBar sideBar={sideBar} setSideBar={setSideBar} />
         <div className={styles.placesContainer}>
           {!selected && <p>Look for a place to clean</p>}

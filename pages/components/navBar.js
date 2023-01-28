@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import { FormControlLabel, FormGroup, Switch } from "@mui/material";
+import Link from "next/link";
 
 export default function NavBar({ sideBar, setSideBar, dark, setDark }) {
   console.log("dark in navbar" + dark);
@@ -40,8 +41,9 @@ export default function NavBar({ sideBar, setSideBar, dark, setDark }) {
               label={dark ? "light" : "dark"}
             />
           </FormGroup>
-
-          <Button color="inherit">Login</Button>
+          <Link href="/login">
+            <a>Login</a>
+          </Link>
         </Toolbar>
       </AppBar>
     </Box>
