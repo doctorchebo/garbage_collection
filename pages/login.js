@@ -1,10 +1,13 @@
 import { Button, TextField } from "@mui/material";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { object, string } from "yup";
+import { login } from "../app/auth/authActions";
 import styles from "../styles/Login.module.css";
 
 const Login = () => {
+  const dispatch = useDispatch();
   const schema = object().shape({
     email: string().required("Email is required"),
     password: string().required("Password is required"),
@@ -18,7 +21,7 @@ const Login = () => {
     validationSchema: schema,
   });
   const onSubmit = (data) => {
-    alert(JSON.stringify(data));
+    dispatch(login(data));
   };
 
   return (

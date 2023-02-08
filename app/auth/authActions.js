@@ -1,3 +1,4 @@
+import { getStepLabelUtilityClass } from "@mui/material";
 import { authAPI } from "../../pages/components/axiosClient";
 
 const SAVE_TOKEN = "SAVE_TOKEN";
@@ -9,13 +10,17 @@ function saveToken(token) {
   };
 }
 
-export function login() {
+export function login(credentials) {
   return async function fetchLocationsThunk(dispatch, getState) {
-    const response = await authAPI.post("token", {
-      email: "marcelo.munoz.coaquira@gmail.com",
-      password: "Jirafita0210",
-    });
-    dispatch(saveToken(response));
+    try {
+      const response = await authAPI.post("token/", credentials);
+      dispatch(saveToken(response.data));
+      console.log(getState());
+    } catch (error) {
+      if (error.response) {
+        console.log(error);
+      }
+    }
   };
 }
 

@@ -19,12 +19,15 @@ import Distance from "./distance";
 import { Combobox, ComboboxButton } from "@reach/combobox";
 import SnackBar from "./snackBar";
 import ContextMenu from "./contextMenu";
+import { useSelector } from "react-redux";
 function Map({ dark, setDark, sideBar, setSideBar }) {
   const [libraries] = useState(["places"]);
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_API_KEY,
     libraries,
   });
+  const auth = useSelector((state) => state.auth);
+  console.log(auth);
   const [selected, setSelected] = useState(null);
   const [directions, setDirections] = useState(null);
   const [saveButton, setSaveButton] = useState(false);
