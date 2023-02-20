@@ -1,20 +1,24 @@
 import { Button, TextField } from "@mui/material";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { object, string } from "yup";
-import { login } from "../app/auth/authActions";
+import { signup } from "../app/auth/authActions";
+import { object, string, ref } from "yup";
+import { useForm } from "react-hook-form";
+import { useEffect } from "react";
 import styles from "../styles/Login.module.css";
 
-const Login = () => {
+function Signup() {
   const dispatch = useDispatch();
   const router = useRouter();
   const user = useSelector((state) => state.auth.user);
   const schema = object().shape({
     email: string().required("Email is required"),
     password: string().required("Password is required"),
+    confirmPassword: string().oneOf(
+      [ref("password"), null],
+      "Passwords must match"
+    ),
   });
   const {
     register,
@@ -32,7 +36,7 @@ const Login = () => {
   }, [user, router]);
 
   const onSubmit = (data) => {
-    dispatch(login(data));
+    alert(JSON.stringify(data));
   };
 
   return (
@@ -57,7 +61,18 @@ const Login = () => {
         type="password"
         fullWidth
       />
-
+      <TextField
+        className={styles.inpuField}
+        name="confirmPassword"
+        error={!!errors.confirmPassword}
+        label="Confirm Password"
+        {...register("confirmPassword")}
+        helperText={
+          errors.confirmPassword ? errors.confirmPassword.message : ""
+        }
+        type="password"
+        fullWidth
+      />
       <Button
         className={styles.submitButton}
         color="primary"
@@ -65,10 +80,10 @@ const Login = () => {
         variant="contained"
         fullWidth
       >
-        Login
+        Sign Up
       </Button>
     </form>
   );
-};
+}
 
-export default Login;
+export default Signup;

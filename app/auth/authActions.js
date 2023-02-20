@@ -26,6 +26,13 @@ export const login = (credentials) => {
   };
 };
 
+export const signup = (credentials) => {
+  return (dispatch) => {
+    try {
+    } catch (error) {}
+  };
+};
+
 export const LogoutUser = () => {
   return (dispatch) => {
     try {

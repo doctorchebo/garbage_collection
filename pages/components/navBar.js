@@ -3,12 +3,12 @@ import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import { FormControlLabel, FormGroup, Switch } from "@mui/material";
 import Link from "next/link";
 import { useSelector } from "react-redux";
+import styles from "../../styles/NavBar.module.css";
 
 export default function NavBar({ sideBar, setSideBar, dark, setDark }) {
   const user = useSelector((state) => state.auth.user);
@@ -16,7 +16,7 @@ export default function NavBar({ sideBar, setSideBar, dark, setDark }) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="absolute">
-        <Toolbar>
+        <Toolbar className={styles.toolbar}>
           <IconButton
             size="large"
             edge="start"
@@ -48,9 +48,14 @@ export default function NavBar({ sideBar, setSideBar, dark, setDark }) {
               <a>Logout</a>
             </Link>
           ) : (
-            <Link href="/login">
-              <a>Login</a>
-            </Link>
+            <>
+              <Link href="/login">
+                <a>Login</a>
+              </Link>
+              <Link href="/signup">
+                <a>Signup</a>
+              </Link>
+            </>
           )}
         </Toolbar>
       </AppBar>
