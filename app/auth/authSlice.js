@@ -1,21 +1,37 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const authState = {
+  token: [],
   user: [],
+  error: {},
+  loading: false,
 };
 
 export const authSlice = createSlice({
   name: "auth",
   initialState: authState,
   reducers: {
-    saveToken: (state, action) => {
+    setToken: (state, action) => {
+      console.log("Setting Token");
+      state.token.push(action.payload);
+    },
+    setError: (state, action) => {
+      console.log("Setting Error");
+      state.error = action.payload;
+    },
+    setLoading: (state, action) => {
+      state.error = action.payload;
+      console.log("Loading " + state.error);
+    },
+    loadUser: (state, action) => {
       state.user.push(action.payload);
+      console.log("User " + JSON.stringify(state.user));
     },
   },
 });
 
 // this is for dispatch
-export const { saveToken } = authSlice.actions;
+export const { setToken, setError, setLoading, loadUser } = authSlice.actions;
 
 // this is for configureStore
 export default authSlice.reducer;

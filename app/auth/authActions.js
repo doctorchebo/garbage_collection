@@ -1,27 +1,27 @@
-import { getStepLabelUtilityClass } from "@mui/material";
-import { authAPI } from "../../pages/components/axiosClient";
+import AxiosService from "../../pages/components/axiosClient";
+import { loadUser, setError, setLoading, setToken } from "./authSlice";
+import jwt_decode from "jwt-decode";
 
-const SAVE_TOKEN = "SAVE_TOKEN";
-
-function saveToken(token) {
-  return {
-    type: SAVE_TOKEN,
-    payload: token,
-  };
-}
-
-export function login(credentials) {
-  return async function fetchLocationsThunk(dispatch, getState) {
+export const login = (credentials) => {
+  return (dispatch) => {
+    dispatch(setLoading(true));
     try {
-      const response = await authAPI.post("token/", credentials);
-      dispatch(saveToken(response.data));
-      console.log(getState());
+      AxiosService.authAPI()
+        .post("token/", credentials)
+        .then((response) => {
+          localStorage.setItem("userDetails", JSON.stringify(response.data));
+          dispatch(setToken(response.data));
+        })
+        .then((response) => {
+          dispatch(setLoading(false));
+          const user = JSON.parse(localStorage.getItem("userDetails")).access;
+          dispatch(loadUser(jwt_decode(user)));
+        })
+        .catch((error) => {
+          setError(error.message);
+        });
     } catch (error) {
-      if (error.response) {
-        console.log(error);
-      }
+      setError(error.message);
     }
   };
-}
-
-export default saveToken;
+};
