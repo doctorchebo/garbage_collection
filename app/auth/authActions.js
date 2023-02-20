@@ -1,5 +1,5 @@
 import AxiosService from "../../pages/components/axiosClient";
-import { loadUser, setError, setLoading, setToken } from "./authSlice";
+import { loadUser, setError, setLoading, setToken, logout } from "./authSlice";
 import jwt_decode from "jwt-decode";
 
 export const login = (credentials) => {
@@ -22,6 +22,17 @@ export const login = (credentials) => {
         });
     } catch (error) {
       setError(error.message);
+    }
+  };
+};
+
+export const LogoutUser = () => {
+  return (dispatch) => {
+    try {
+      localStorage.removeItem("userDetails");
+      dispatch(logout());
+    } catch (error) {
+      dispatch(setError(error.message));
     }
   };
 };

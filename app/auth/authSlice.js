@@ -27,11 +27,16 @@ export const authSlice = createSlice({
       state.user.push(action.payload);
       console.log("User " + JSON.stringify(state.user));
     },
+    logout: (state) => {
+      state.user = [];
+      console.log("User is logged out " + state.user);
+    },
   },
 });
 
 // this is for dispatch
-export const { setToken, setError, setLoading, loadUser } = authSlice.actions;
+export const { setToken, setError, setLoading, loadUser, logout } =
+  authSlice.actions;
 
 // this is for configureStore
 export default authSlice.reducer;

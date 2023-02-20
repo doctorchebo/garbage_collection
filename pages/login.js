@@ -1,14 +1,17 @@
 import { Button, TextField } from "@mui/material";
+import { useRouter } from "next/router";
 import React, { useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { object, string } from "yup";
-import { login, setToken } from "../app/auth/authActions";
+import { login } from "../app/auth/authActions";
 import styles from "../styles/Login.module.css";
 
 const Login = () => {
   const dispatch = useDispatch();
-  const state = useSelector((state) => state);
+  const router = useRouter();
+  const user = useSelector((state) => state.auth.user);
   const schema = object().shape({
     email: string().required("Email is required"),
     password: string().required("Password is required"),
@@ -21,9 +24,15 @@ const Login = () => {
   } = useForm({
     validationSchema: schema,
   });
+
+  useEffect(() => {
+    if (user.length) {
+      router.push("/");
+    }
+  }, [user, router]);
+
   const onSubmit = (data) => {
     dispatch(login(data));
-    console.log("token =>" + JSON.stringify(state));
   };
 
   return (

@@ -8,8 +8,10 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import { FormControlLabel, FormGroup, Switch } from "@mui/material";
 import Link from "next/link";
+import { useSelector } from "react-redux";
 
 export default function NavBar({ sideBar, setSideBar, dark, setDark }) {
+  const user = useSelector((state) => state.auth.user);
   console.log("dark in navbar" + dark);
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -41,9 +43,15 @@ export default function NavBar({ sideBar, setSideBar, dark, setDark }) {
               label={dark ? "light" : "dark"}
             />
           </FormGroup>
-          <Link href="/login">
-            <a>Login</a>
-          </Link>
+          {user.length ? (
+            <Link href="/logout">
+              <a>Logout</a>
+            </Link>
+          ) : (
+            <Link href="/login">
+              <a>Login</a>
+            </Link>
+          )}
         </Toolbar>
       </AppBar>
     </Box>
