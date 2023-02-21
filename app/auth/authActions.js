@@ -29,7 +29,12 @@ export const login = (credentials) => {
 export const signup = (credentials) => {
   return (dispatch) => {
     try {
-    } catch (error) {}
+      AxiosService.authAPI.post("signup", credentials).then((response) => {
+        console.log(response.data);
+      });
+    } catch (error) {
+      dispatch(setError(error.message));
+    }
   };
 };
 

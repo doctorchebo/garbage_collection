@@ -7,13 +7,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { object, string } from "yup";
 import { login } from "../app/auth/authActions";
 import styles from "../styles/Login.module.css";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 const Login = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const user = useSelector((state) => state.auth.user);
   const schema = object().shape({
-    email: string().required("Email is required"),
+    email: string().email().required("Email is required"),
     password: string().required("Password is required"),
   });
   const {
@@ -22,7 +23,7 @@ const Login = () => {
     watch,
     formState: { errors },
   } = useForm({
-    validationSchema: schema,
+    resolver: yupResolver(schema),
   });
 
   useEffect(() => {

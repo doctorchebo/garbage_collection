@@ -4,6 +4,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { signup } from "../app/auth/authActions";
 import { object, string, ref } from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { useEffect } from "react";
 import styles from "../styles/Login.module.css";
@@ -13,12 +14,11 @@ function Signup() {
   const router = useRouter();
   const user = useSelector((state) => state.auth.user);
   const schema = object().shape({
-    email: string().required("Email is required"),
-    password: string().required("Password is required"),
-    confirmPassword: string().oneOf(
-      [ref("password"), null],
-      "Passwords must match"
-    ),
+    email: string().email().required("Email is required"),
+    password: string().min(8).max(15).required("Password is required"),
+    confirmPassword: string()
+      .oneOf([ref("password"), null])
+      .required("Passwords must match"),
   });
   const {
     register,
@@ -26,7 +26,7 @@ function Signup() {
     watch,
     formState: { errors },
   } = useForm({
-    validationSchema: schema,
+    resolver: yupResolver(schema),
   });
 
   useEffect(() => {
