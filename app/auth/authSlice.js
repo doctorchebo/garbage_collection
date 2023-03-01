@@ -4,6 +4,7 @@ const authState = {
   token: [],
   user: [],
   error: {},
+  isSignup: false,
   loading: false,
 };
 
@@ -16,8 +17,8 @@ export const authSlice = createSlice({
       state.token.push(action.payload);
     },
     setError: (state, action) => {
-      console.log("Setting Error");
       state.error = action.payload;
+      console.log("Setting Error: " + state.error);
     },
     setLoading: (state, action) => {
       state.error = action.payload;
@@ -31,11 +32,15 @@ export const authSlice = createSlice({
       state.user = [];
       console.log("User is logged out " + state.user);
     },
+    setSignup: (state, action) => {
+      state.isSignup = action.payload;
+      console.log("User is signed up: " + state.isSignup);
+    },
   },
 });
 
 // this is for dispatch
-export const { setToken, setError, setLoading, loadUser, logout } =
+export const { setToken, setError, setLoading, loadUser, logout, setSignup } =
   authSlice.actions;
 
 // this is for configureStore

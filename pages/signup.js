@@ -8,11 +8,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { useEffect } from "react";
 import styles from "../styles/Login.module.css";
+import { setSignup } from "../app/auth/authSlice";
 
 function Signup() {
   const dispatch = useDispatch();
   const router = useRouter();
-  const user = useSelector((state) => state.auth.user);
+  const { isSignup, error } = useSelector((state) => state.auth);
   const schema = object().shape({
     email: string().email().required("Email is required"),
     password: string().min(8).max(15).required("Password is required"),
@@ -30,13 +31,19 @@ function Signup() {
   });
 
   useEffect(() => {
-    if (user.length) {
-      router.push("/");
+    if (isSignup) {
+      router.push("signup-success/");
+      dispatch(setSignup(false));
     }
-  }, [user, router]);
+  }, [isSignup, dispatch, router]);
 
   const onSubmit = (data) => {
     alert(JSON.stringify(data));
+    dispatch(signup(data));
+    if (Object.keys(error).length !== 0) {
+      alert(error.response?.data?.message);
+      dispatch(setError({}));
+    }
   };
 
   return (

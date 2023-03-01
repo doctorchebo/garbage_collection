@@ -1,6 +1,14 @@
 import AxiosService from "../../pages/components/axiosClient";
-import { loadUser, setError, setLoading, setToken, logout } from "./authSlice";
+import {
+  loadUser,
+  setError,
+  setLoading,
+  setToken,
+  logout,
+  setSignup,
+} from "./authSlice";
 import jwt_decode from "jwt-decode";
+import { useRouter } from "next/router";
 
 export const login = (credentials) => {
   return (dispatch) => {
@@ -29,11 +37,17 @@ export const login = (credentials) => {
 export const signup = (credentials) => {
   return (dispatch) => {
     try {
-      AxiosService.authAPI.post("signup", credentials).then((response) => {
-        console.log(response.data);
-      });
+      AxiosService.authAPI()
+        .post("signup/", credentials)
+        .then((response) => {
+          console.log(response.data);
+          dispatch(setSignup(true));
+        })
+        .catch((error) => {
+          dispatch(setError(error));
+        });
     } catch (error) {
-      dispatch(setError(error.message));
+      dispatch(setError(error));
     }
   };
 };
