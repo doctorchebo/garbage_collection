@@ -26,10 +26,10 @@ export const login = (credentials) => {
           dispatch(loadUser(jwt_decode(user)));
         })
         .catch((error) => {
-          setError(error.message);
+          setError(error);
         });
     } catch (error) {
-      setError(error.message);
+      setError(error);
     }
   };
 };

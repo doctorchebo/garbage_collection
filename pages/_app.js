@@ -22,6 +22,9 @@ function MyApp({ Component, pageProps }) {
       secondary: {
         main: "#454ec9",
       },
+      inputBackground: {
+        main: "#e8f08fe",
+      },
     },
   });
   return (

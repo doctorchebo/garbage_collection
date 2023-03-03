@@ -1,4 +1,12 @@
-import { Button, TextField } from "@mui/material";
+import {
+  Button,
+  FormHelperText,
+  IconButton,
+  InputAdornment,
+  OutlinedInput,
+  TextField,
+  useTheme,
+} from "@mui/material";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { useEffect } from "react";
@@ -8,15 +16,26 @@ import { object, string } from "yup";
 import { login } from "../app/auth/authActions";
 import styles from "../styles/Login.module.css";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { setError } from "../app/auth/authSlice";
 
 const Login = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const user = useSelector((state) => state.auth.user);
+  const theme = useTheme();
+  const { user, error } = useSelector((state) => state.auth);
+  console.log("error: " + error);
   const schema = object().shape({
     email: string().email().required("Email is required"),
     password: string().required("Password is required"),
   });
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
   const {
     register,
     handleSubmit,
@@ -31,6 +50,10 @@ const Login = () => {
       router.push("/");
     }
   }, [user, router]);
+
+  useEffect(() => {
+    dispatch(setError(false));
+  }, [dispatch]);
 
   const onSubmit = (data) => {
     dispatch(login(data));
@@ -49,16 +72,30 @@ const Login = () => {
         fullWidth
       />
       <TextField
+        id="outlined-adornment-password"
         className={styles.inpuField}
         name="password"
         error={!!errors.password}
         label="Password"
         {...register("password")}
         helperText={errors.password ? errors.password.message : ""}
-        type="password"
+        type={showPassword ? "text" : "password"}
         fullWidth
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={handleClickShowPassword}
+                onMouseDown={handleMouseDownPassword}
+                edge="end"
+              >
+                {showPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
       />
-
       <Button
         className={styles.submitButton}
         color="primary"
@@ -68,6 +105,9 @@ const Login = () => {
       >
         Login
       </Button>
+      {error && (
+        <div className={styles.error}>Incorrect email and/or password</div>
+      )}
     </form>
   );
 };

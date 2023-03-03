@@ -10,3 +10,11 @@
 .submitButton {
   margin: 1rem;
 }
+
+.error {
+  font-weight: 400;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #E5344C;
+}
