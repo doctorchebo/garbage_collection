@@ -1,52 +1,60 @@
 import axios from "axios";
-import { useSelector } from "react-redux";
 const baseUrl = "http://127.0.0.1:8000";
 
-class AxiosService {
-  locationsAPI() {
-    return axios.create({
-      baseURL: `${baseUrl}/locations/`,
-    });
+export const locationsAPI = axios.create({
+  baseURL: `${baseUrl}/locations/`,
+});
+
+locationsAPI.interceptors.request.use(
+  (config) => {
+    const userDetails = JSON.parse(localStorage.getItem("userDetails"));
+    if (userDetails) {
+      config.headers["Authorization"] = `Bearer ${userDetails.access}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
+);
 
-  authAPI() {
-    return axios.create({
-      baseURL: `${baseUrl}/auth/`,
-      method: "POST",
-      withCredentials: true,
-    });
+locationsAPI.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    const config = error?.config;
+    if (error.response) {
+      if (error.response.status === 401 && !config?.sent) {
+        console.log(
+          "access token expired, using refresh token to get new access token"
+        );
+        config.sent = true;
+        const userDetails = JSON.parse(localStorage.getItem("userDetails"));
+        return AxiosService.authAPI()
+          .post("token/refresh/", userDetails.refresh)
+          .then((res) => {
+            config.headers["Authorization"] = `Bearer ${res.access}`;
+            localStorage.setItem("userDetails", res.access);
+            console.log("new access token was saved");
+            return axios(config);
+          })
+          .catch((error) => {
+            Promise.reject(error);
+            removeTokens();
+          });
+      } else if (error.response.status === 403) {
+      }
+    }
   }
+);
 
-  usersAPI() {
-    return axios.create({
-      baseURL: `${baseUrl}/users/`,
-    });
-  }
-}
+export const authAPI = axios.create({
+  baseURL: `${baseUrl}/auth/`,
+  method: "POST",
+  withCredentials: true,
+});
 
-export default new AxiosService();
-
-export const useAxios = (axiosInstance) => {
-  const { token } = useSelector((state) => state.auth.user);
-
-  axiosInstance();
-
-  axiosInstance.interceptors.request.use((req) => {
-    const user = jwt_decode(token.access);
-    const isExpired = dayjs.unix(user.exp).diff(dayjs()) < 1;
-
-    if (!isExpired) return req;
-
-    const response = axios.get(`${baseUrl}/auth/token/refresh`, {
-      headers: { Authorization: `Bearer ${token?.refresh}` },
-    });
-
-    localStorage.setItem("userDetails", JSON.stringify(response.data));
-
-    saveToken(response.data);
-    loadUser(jwt_decode(response.data.access));
-
-    req.headers.Authorization = `Bearer ${response.data.access}`;
-    return req;
-  });
-};
+export const usersAPI = axios.create({
+  baseURL: `${baseUrl}/users/`,
+});

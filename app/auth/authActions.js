@@ -1,4 +1,4 @@
-import AxiosService from "../../pages/components/axiosClient";
+import AxiosService, { authAPI } from "../../pages/components/axiosClient";
 import {
   loadUser,
   setError,
@@ -14,7 +14,7 @@ export const login = (credentials) => {
   return (dispatch) => {
     dispatch(setLoading(true));
     try {
-      AxiosService.authAPI()
+      authAPI
         .post("token/", credentials)
         .then((response) => {
           localStorage.setItem("userDetails", JSON.stringify(response.data));
@@ -37,7 +37,7 @@ export const login = (credentials) => {
 export const signup = (credentials) => {
   return (dispatch) => {
     try {
-      AxiosService.authAPI()
+      authAPI
         .post("signup/", credentials)
         .then((response) => {
           console.log(response.data);

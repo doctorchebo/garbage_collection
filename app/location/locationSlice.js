@@ -8,14 +8,14 @@ export const locationSlice = createSlice({
   name: "locations",
   initialState: locationState,
   reducers: {
-    addMyLocations: (state, action) => {
+    addLocation: (state, action) => {
       state.locations.push(action.payload);
     },
   },
 });
 
 // this is for dispatch
-export const { addMyLocations } = locationSlice.actions;
+export const { addLocation } = locationSlice.actions;
 
 // this is for configureStore
 export default locationSlice.reducer;

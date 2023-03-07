@@ -19,7 +19,8 @@ import Distance from "./distance";
 import { Combobox, ComboboxButton } from "@reach/combobox";
 import SnackBar from "./snackBar";
 import ContextMenu from "./contextMenu";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { saveLocation } from "../../app/location/locationActions";
 function Map({ dark, setDark, sideBar, setSideBar }) {
   const [libraries] = useState(["places"]);
   const { isLoaded } = useLoadScript({
@@ -35,11 +36,14 @@ function Map({ dark, setDark, sideBar, setSideBar }) {
   const [isSearch, setIsSearch] = useState(false);
   const [open, setOpen] = useState(false);
   const [contextMenu, setContextMenu] = useState(null);
+  const dispatch = useDispatch();
   console.log(locations);
   const randomLocations = useMemo(
     () => generateLocations(selected),
     [selected]
   );
+
+  console.log("selected location " + JSON.stringify(selected));
 
   const options = useMemo(
     () => ({
@@ -89,11 +93,9 @@ function Map({ dark, setDark, sideBar, setSideBar }) {
     setSaveButton(true);
   };
 
-  const saveLocation = () => {
-    console.log("saving");
+  const addLocation = () => {
+    dispatch(saveLocation(selected));
     setLocations([...locations, selected]);
-    setOpen(true);
-    console.log("saved");
   };
 
   const handleContextMenu = (event) => {
@@ -119,7 +121,7 @@ function Map({ dark, setDark, sideBar, setSideBar }) {
           {directions && <Distance leg={directions.routes[0].legs[0]} />}
           {selected && (
             <Combobox>
-              <ComboboxButton onClick={() => saveLocation()}>
+              <ComboboxButton onClick={() => addLocation()}>
                 Save Location
               </ComboboxButton>
             </Combobox>
