@@ -1,7 +1,7 @@
 import axios from "axios";
 import React from "react";
 import { setError } from "../auth/authSlice";
-import { addLocation } from "./locationSlice";
+import { addLocation, setSaveLocationSuccess } from "./locationSlice";
 import AxiosService, { locationsAPI } from "../../pages/components/axiosClient";
 export function fetchMyLocations() {
   return async function fetchLocationsThunk(dispatch, getState) {
@@ -21,6 +21,7 @@ export const saveLocation = (coordinates) => {
         })
         .then(() => {
           console.log("saved succesfully");
+          dispatch(setSaveLocationSuccess(true));
         })
         .catch((error) => {
           dispatch(setError(error));

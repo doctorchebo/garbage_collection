@@ -6,6 +6,7 @@ const authState = {
   error: {},
   isSignup: false,
   loading: false,
+  loginSuccess: false,
 };
 
 export const authSlice = createSlice({
@@ -36,12 +37,22 @@ export const authSlice = createSlice({
       state.isSignup = action.payload;
       console.log("User is signed up: " + state.isSignup);
     },
+    setLoginSuccess: (state, action) => {
+      state.loginSuccess = action.payload;
+    },
   },
 });
 
 // this is for dispatch
-export const { setToken, setError, setLoading, loadUser, logout, setSignup } =
-  authSlice.actions;
+export const {
+  setToken,
+  setError,
+  setLoading,
+  loadUser,
+  logout,
+  setSignup,
+  setLoginSuccess,
+} = authSlice.actions;
 
 // this is for configureStore
 export default authSlice.reducer;

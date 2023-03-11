@@ -6,6 +6,7 @@ import {
   setToken,
   logout,
   setSignup,
+  setLoginSuccess,
 } from "./authSlice";
 import jwt_decode from "jwt-decode";
 import { useRouter } from "next/router";
@@ -24,6 +25,7 @@ export const login = (credentials) => {
           dispatch(setLoading(false));
           const user = JSON.parse(localStorage.getItem("userDetails")).access;
           dispatch(loadUser(jwt_decode(user)));
+          dispatch(setLoginSuccess(true));
         })
         .catch((error) => {
           setError(error);

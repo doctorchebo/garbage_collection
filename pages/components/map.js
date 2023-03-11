@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   useJsApiLoader,
   GoogleMap,
@@ -9,7 +9,7 @@ import {
   DirectionsRenderer,
 } from "@react-google-maps/api";
 import { useMemo } from "react";
-import { Box } from "@mui/material";
+import { Alert, AlertTitle, Box, Fade } from "@mui/material";
 import styles from "../../styles/Map.module.css";
 import PlacesAutocomplete from "./placesAutocomplete";
 import SearchForm from "./searchForm";
@@ -21,6 +21,10 @@ import SnackBar from "./snackBar";
 import ContextMenu from "./contextMenu";
 import { useDispatch, useSelector } from "react-redux";
 import { saveLocation } from "../../app/location/locationActions";
+import {
+  setSaveLocationSuccess,
+  setSelectedLocation,
+} from "../../app/location/locationSlice";
 function Map({ dark, setDark, sideBar, setSideBar }) {
   const [libraries] = useState(["places"]);
   const { isLoaded } = useLoadScript({
@@ -28,6 +32,9 @@ function Map({ dark, setDark, sideBar, setSideBar }) {
     libraries,
   });
   const auth = useSelector((state) => state.auth);
+  const locationSavedSuccess = useSelector(
+    (state) => state.locations.saveLocationSuccess
+  );
   console.log(auth);
   const [selected, setSelected] = useState(null);
   const [directions, setDirections] = useState(null);
@@ -44,6 +51,12 @@ function Map({ dark, setDark, sideBar, setSideBar }) {
   );
 
   console.log("selected location " + JSON.stringify(selected));
+
+  useEffect(() => {
+    setTimeout(() => {
+      dispatch(setSaveLocationSuccess(false));
+    }, 3000);
+  }, [dispatch]);
 
   const options = useMemo(
     () => ({
@@ -63,6 +76,7 @@ function Map({ dark, setDark, sideBar, setSideBar }) {
       lat,
       lng,
     });
+    dispatch(setSelectedLocation({ lat, lng }));
   };
   const getDirections = (house) => {
     const service = new google.maps.DirectionsService();
@@ -90,6 +104,7 @@ function Map({ dark, setDark, sideBar, setSideBar }) {
     const lng = event.latLng.lng();
     setIsSearch(false);
     setSelected({ lat, lng });
+    dispatch(setSelectedLocation({ lat, lng }));
     setSaveButton(true);
   };
 
@@ -119,6 +134,22 @@ function Map({ dark, setDark, sideBar, setSideBar }) {
         <div className={styles.placesContainer}>
           {!selected && <p>Look for a place to clean</p>}
           {directions && <Distance leg={directions.routes[0].legs[0]} />}
+          {locationSavedSuccess && (
+            <Fade
+              in={locationSavedSuccess} //Write the needed condition here to make it appear
+              timeout={{ enter: 1000, exit: 1000 }} //Edit these two values to change the duration of transition when the element is getting appeared and disappeard
+              addEndListener={() => {
+                setTimeout(() => {
+                  dispatch(setSaveLocationSuccess(false));
+                }, 2000);
+              }}
+            >
+              <Alert severity="success" variant="standard" className="alert">
+                <AlertTitle>Success</AlertTitle>
+                Saved Successfully!
+              </Alert>
+            </Fade>
+          )}
           {selected && (
             <Combobox>
               <ComboboxButton onClick={() => addLocation()}>
@@ -130,6 +161,7 @@ function Map({ dark, setDark, sideBar, setSideBar }) {
             setSelected={(pos) => {
               setIsSearch(true);
               setSelected(pos);
+              dispatch(setSelectedLocation(pos));
               mapRef.current.panTo(pos);
             }}
           />

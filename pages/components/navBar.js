@@ -12,7 +12,7 @@ import styles from "../../styles/NavBar.module.css";
 
 export default function NavBar({ sideBar, setSideBar, dark, setDark }) {
   const user = useSelector((state) => state.auth.user);
-  console.log("dark in navbar" + dark);
+  const token = localStorage.getItem("userDetails") ? true : false;
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="absolute">
@@ -43,7 +43,7 @@ export default function NavBar({ sideBar, setSideBar, dark, setDark }) {
               label={dark ? "light" : "dark"}
             />
           </FormGroup>
-          {user.length ? (
+          {token ? (
             <Link href="/logout">
               <a>Logout</a>
             </Link>
