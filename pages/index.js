@@ -1,12 +1,12 @@
-import { Box, Container } from "@mui/material";
+import { Box, Container, createTheme, ThemeProvider } from "@mui/material";
+import { useSelector } from "react-redux";
 import Map from "./components/map";
 import NavBar from "./components/navBar";
-import SearchForm from "./components/searchForm";
 
-export default function Home({ dark, setDark }) {
+export default function Home() {
   return (
     <Box position="relative">
-      <Map dark={dark} setDark={setDark} />
+      <Map />
     </Box>
   );
 }

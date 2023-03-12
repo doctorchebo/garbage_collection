@@ -1,6 +1,6 @@
-import { Button, TextField } from "@mui/material";
+import { Button, IconButton, InputAdornment, TextField } from "@mui/material";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { signup } from "../app/auth/authActions";
 import { object, string, ref } from "yup";
@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { useEffect } from "react";
 import styles from "../styles/Login.module.css";
 import { setSignup } from "../app/auth/authSlice";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 function Signup() {
   const dispatch = useDispatch();
@@ -18,9 +19,16 @@ function Signup() {
     email: string().email().required("Email is required"),
     password: string().min(8).max(15).required("Password is required"),
     confirmPassword: string()
-      .oneOf([ref("password"), null])
-      .required("Passwords must match"),
+      .required("Confirm password is required")
+      .oneOf([ref("password")], "Your passwords do not match."),
   });
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
   const {
     register,
     handleSubmit,
@@ -65,8 +73,22 @@ function Signup() {
         label="Password"
         {...register("password")}
         helperText={errors.password ? errors.password.message : ""}
-        type="password"
+        type={showPassword ? "text" : "password"}
         fullWidth
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={handleClickShowPassword}
+                onMouseDown={handleMouseDownPassword}
+                edge="end"
+              >
+                {showPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
       />
       <TextField
         className={styles.inpuField}
@@ -77,8 +99,22 @@ function Signup() {
         helperText={
           errors.confirmPassword ? errors.confirmPassword.message : ""
         }
-        type="password"
+        type={showPassword ? "text" : "password"}
         fullWidth
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={handleClickShowPassword}
+                onMouseDown={handleMouseDownPassword}
+                edge="end"
+              >
+                {showPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
       />
       <Button
         className={styles.submitButton}

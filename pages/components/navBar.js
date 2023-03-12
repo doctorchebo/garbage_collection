@@ -7,12 +7,32 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import { FormControlLabel, FormGroup, Switch } from "@mui/material";
 import Link from "next/link";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import styles from "../../styles/NavBar.module.css";
+import { useState } from "react";
+import { useEffect } from "react";
+import { setDarkMode, setSideBar } from "../../app/ui/uiSlice";
 
-export default function NavBar({ sideBar, setSideBar, dark, setDark }) {
+import logo from "../../public/logo.jpg";
+import { useRouter } from "next/router";
+import Image from "next/image";
+
+export default function NavBar({ dark, setDark }) {
   const user = useSelector((state) => state.auth.user);
-  const token = localStorage.getItem("userDetails") ? true : false;
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const sideBar = useSelector((state) => state.ui.sideBar);
+  console.log("sidebar: " + sideBar);
+  const [token, setToken] = useState(null);
+  useEffect(() => {
+    const token = localStorage.getItem("userDetails") != null ? true : false;
+    setToken(token);
+  }, []);
+
+  const handleDarkModeOnchange = () => {
+    setDark((prev) => !prev);
+    dispatch(setDarkMode(dark));
+  };
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="absolute">
@@ -23,24 +43,31 @@ export default function NavBar({ sideBar, setSideBar, dark, setDark }) {
             color="inherit"
             aria-label="menu"
             sx={{ mr: 2 }}
-            onClick={() => setSideBar(!sideBar)}
+            onClick={() => dispatch(setSideBar(!sideBar))}
           >
             <MenuIcon />
           </IconButton>
+          <Box className={styles.logo}>
+            <Image
+              src={logo}
+              alt="logo"
+              onClick={() => router.push("/")}
+            />
+          </Box>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Garbage Collection App - By Chebo
+            Clean City
           </Typography>
           <FormGroup>
             <FormControlLabel
               control={
                 <Switch
                   checked={dark}
-                  onChange={() => setDark((prev) => !prev)}
+                  onChange={() => handleDarkModeOnchange()}
                   inputProps={{ "aria-label": "controlled" }}
                   color="secondary"
                 />
               }
-              label={dark ? "light" : "dark"}
+              label={dark ? "dark" : "light"}
             />
           </FormGroup>
           {token ? (

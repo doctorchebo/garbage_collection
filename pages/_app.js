@@ -5,17 +5,16 @@ import * as React from "react";
 import { red } from "@mui/material/colors";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { useState } from "react";
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 import store from "../app/store";
 import NavBar from "./components/navBar";
+import Layout from "./components/layout";
 
 function MyApp({ Component, pageProps }) {
-  const [sideBar, setSideBar] = useState(false);
   const [dark, setDark] = useState(false);
-  console.log(dark);
-  const theme = createTheme({
+  const lightTheme = createTheme({
     palette: {
-      type: dark ? "dark" : "light",
+      type: "light",
       primary: {
         main: "#4a9034",
       },
@@ -27,29 +26,33 @@ function MyApp({ Component, pageProps }) {
       },
     },
   });
+  const darkTheme = createTheme({
+    palette: {
+      type: "dark",
+      primary: {
+        main: "#09380D",
+      },
+      secondary: {
+        main: "#27757E",
+      },
+      inputBackground: {
+        main: "#e8f08fe",
+      },
+    },
+  });
   return (
-    <div>
-      <Head>
-        <link rel="shortcut icon" href={favicon.src} type="image/x-icon" />
-      </Head>
-      <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <NavBar
-            sideBar={sideBar}
-            setSideBar={setSideBar}
-            dark={dark}
-            setDark={setDark}
-          />
-          <Component
-            {...pageProps}
-            dark={dark}
-            setDark={setDark}
-            sideBar={sideBar}
-            setSideBar={setSideBar}
-          />
+    <Provider store={store}>
+      <div>
+        <Head>
+          <link rel="shortcut icon" href={favicon.src} type="image/x-icon" />
+        </Head>
+        <ThemeProvider theme={dark ? darkTheme : lightTheme}>
+          <Layout dark={dark} setDark={setDark}>
+            <Component {...pageProps} />
+          </Layout>
         </ThemeProvider>
-      </Provider>
-    </div>
+      </div>
+    </Provider>
   );
 }
 

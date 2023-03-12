@@ -130,7 +130,7 @@ function Map({ dark, setDark, sideBar, setSideBar }) {
   return (
     <>
       <div onContextMenu={handleContextMenu} style={{ cursor: "context-menu" }}>
-        <SideBar sideBar={sideBar} setSideBar={setSideBar} />
+        <SideBar />
         <div className={styles.placesContainer}>
           {!selected && <p>Look for a place to clean</p>}
           {directions && <Distance leg={directions.routes[0].legs[0]} />}

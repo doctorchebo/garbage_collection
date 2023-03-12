@@ -1,3 +1,15 @@
 .toolbar > a {
   margin: 0.5rem;
 }
+
+.toolbar > * {
+  padding: 0.2em;
+}
+.logo > :hover {
+  cursor: pointer;
+}
+
+.logo {
+  height: 50px;
+  width: 50px;
+}

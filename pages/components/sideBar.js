@@ -12,14 +12,15 @@ import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
 import { useEffect, useState } from "react";
 import { formLabelClasses } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { setSideBar } from "../../app/ui/uiSlice";
+import { LocationOn } from "@mui/icons-material";
+import { useRouter } from "next/router";
 
-export default function SideBar({ sideBar, setSideBar }) {
-  const [sideBarState, setSideBarState] = useState(false);
-
-  useEffect(() => {
-    setSideBarState(sideBar);
-  }, [sideBar]);
-
+export default function SideBar() {
+  const sideBar = useSelector((state) => state.ui.sideBar);
+  const dispatch = useDispatch();
+  const router = useRouter();
   const toggleDrawer = (open) => (event) => {
     if (
       event.type === "keydown" &&
@@ -27,8 +28,15 @@ export default function SideBar({ sideBar, setSideBar }) {
     ) {
       return;
     }
-    setSideBarState((prev) => !prev);
-    setSideBar((prev) => !prev);
+    dispatch(setSideBar(open));
+  };
+
+  const handleMenuClick = (index) => {
+    console.log("index: " + index);
+    switch (index) {
+      case 0:
+        router.push("/my-locations");
+    }
   };
 
   const list = (anchor) => (
@@ -39,24 +47,11 @@ export default function SideBar({ sideBar, setSideBar }) {
       onKeyDown={toggleDrawer(false)}
     >
       <List>
-        {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
+        {["My locations", "Events", "Configuration"].map((text, index) => (
+          <ListItem key={index} disablePadding>
+            <ListItemButton onClick={() => handleMenuClick(index)}>
               <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-      <Divider />
-      <List>
-        {["All mail", "Trash", "Spam"].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                <LocationOn />
               </ListItemIcon>
               <ListItemText primary={text} />
             </ListItemButton>
@@ -70,11 +65,7 @@ export default function SideBar({ sideBar, setSideBar }) {
     <div>
       {["left"].map((anchor) => (
         <React.Fragment key={"left"}>
-          <Drawer
-            anchor={"left"}
-            open={sideBarState}
-            onClose={toggleDrawer(false)}
-          >
+          <Drawer anchor={"left"} open={sideBar} onClose={toggleDrawer(false)}>
             {list("left")}
           </Drawer>
         </React.Fragment>

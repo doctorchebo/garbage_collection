@@ -22,7 +22,6 @@ import { setError } from "../app/auth/authSlice";
 const Login = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const theme = useTheme();
   const { user, error } = useSelector((state) => state.auth);
   console.log("error: " + error);
   const schema = object().shape({
