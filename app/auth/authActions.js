@@ -7,6 +7,7 @@ import {
   logout,
   setSignup,
   setLoginSuccess,
+  setIsAuth,
 } from "./authSlice";
 import jwt_decode from "jwt-decode";
 import { useRouter } from "next/router";
@@ -22,28 +23,31 @@ export const login = (credentials) => {
           dispatch(setToken(response.data));
         })
         .then((response) => {
-          dispatch(setLoading(false));
           const user = JSON.parse(localStorage.getItem("userDetails")).access;
           dispatch(loadUser(jwt_decode(user)));
           dispatch(setLoginSuccess(true));
+          dispatch(setLoading(false));
+          dispatch(setIsAuth(true));
         })
         .catch((error) => {
-          setError(error);
+          setError(error.message);
         });
     } catch (error) {
-      setError(error);
+      setError(error.message);
     }
   };
 };
 
 export const signup = (credentials) => {
   return (dispatch) => {
+    dispatch(setLoading(true));
     try {
       authAPI
         .post("signup/", credentials)
         .then((response) => {
           console.log(response.data);
           dispatch(setSignup(true));
+          dispatch(setLoading(false));
         })
         .catch((error) => {
           dispatch(setError(error));
@@ -58,7 +62,7 @@ export const LogoutUser = () => {
   return (dispatch) => {
     try {
       localStorage.removeItem("userDetails");
-      dispatch(logout());
+      dispatch(setIsAuth(false));
     } catch (error) {
       dispatch(setError(error.message));
     }

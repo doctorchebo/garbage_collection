@@ -1,7 +1,11 @@
 import axios from "axios";
 import React from "react";
-import { setError } from "../auth/authSlice";
-import { addLocation, setSaveLocationSuccess } from "./locationSlice";
+import { setError, setHasError } from "../auth/authSlice";
+import {
+  addLocation,
+  setSaveLocationFailure,
+  setSaveLocationSuccess,
+} from "./locationSlice";
 import AxiosService, { locationsAPI } from "../../pages/components/axiosClient";
 export function fetchMyLocations() {
   return async function fetchLocationsThunk(dispatch, getState) {
@@ -17,17 +21,19 @@ export const saveLocation = (coordinates) => {
       locationsAPI
         .post("add-location", coordinates)
         .then((response) => {
-          dispatch(addLocation(JSON.stringify(response)));
-        })
-        .then(() => {
-          console.log("saved succesfully");
-          dispatch(setSaveLocationSuccess(true));
+          if (response != undefined) {
+            dispatch(addLocation(JSON.stringify(response)));
+            dispatch(setSaveLocationSuccess(true));
+          } else {
+            dispatch(setHasError(true));
+          }
         })
         .catch((error) => {
-          dispatch(setError(error));
+          dispatch(setError(error.message));
+          dispatch(setHasError(true));
         });
     } catch (error) {
-      dispatch(setError(error));
+      dispatch(setError(error.message));
     }
   };
 };

@@ -4,6 +4,7 @@ const locationState = {
   locations: [],
   selectedLocation: [],
   saveLocationSuccess: false,
+  saveLocationFailure: false,
 };
 
 export const locationSlice = createSlice({
@@ -19,12 +20,19 @@ export const locationSlice = createSlice({
     setSaveLocationSuccess: (state, action) => {
       state.saveLocationSuccess = action.payload;
     },
+    setSaveLocationFailure: (state, action) => {
+      state.saveLocationFailure = action.payload;
+    },
   },
 });
 
 // this is for dispatch
-export const { addLocation, setSelectedLocation, setSaveLocationSuccess } =
-  locationSlice.actions;
+export const {
+  addLocation,
+  setSelectedLocation,
+  setSaveLocationSuccess,
+  setSaveLocationFailure,
+} = locationSlice.actions;
 
 // this is for configureStore
 export default locationSlice.reducer;

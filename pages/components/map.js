@@ -9,7 +9,7 @@ import {
   DirectionsRenderer,
 } from "@react-google-maps/api";
 import { useMemo } from "react";
-import { Alert, AlertTitle, Box, Fade } from "@mui/material";
+import { Alert, AlertTitle, Box, Button, Fade } from "@mui/material";
 import styles from "../../styles/Map.module.css";
 import PlacesAutocomplete from "./placesAutocomplete";
 import SearchForm from "./searchForm";
@@ -25,17 +25,18 @@ import {
   setSaveLocationSuccess,
   setSelectedLocation,
 } from "../../app/location/locationSlice";
+import { setError, setHasError } from "../../app/auth/authSlice";
+import { LocationOn } from "@mui/icons-material";
 function Map({ dark, setDark, sideBar, setSideBar }) {
   const [libraries] = useState(["places"]);
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_API_KEY,
     libraries,
   });
-  const auth = useSelector((state) => state.auth);
+  const hasError = useSelector((state) => state.auth.hasError);
   const locationSavedSuccess = useSelector(
     (state) => state.locations.saveLocationSuccess
   );
-  console.log(auth);
   const [selected, setSelected] = useState(null);
   const [directions, setDirections] = useState(null);
   const [saveButton, setSaveButton] = useState(false);
@@ -50,14 +51,6 @@ function Map({ dark, setDark, sideBar, setSideBar }) {
     [selected]
   );
 
-  console.log("selected location " + JSON.stringify(selected));
-
-  useEffect(() => {
-    setTimeout(() => {
-      dispatch(setSaveLocationSuccess(false));
-    }, 3000);
-  }, [dispatch]);
-
   const options = useMemo(
     () => ({
       mapId: "60597b3810980490",
@@ -70,8 +63,8 @@ function Map({ dark, setDark, sideBar, setSideBar }) {
   const onLoad = useCallback((map) => (mapRef.current = map), []);
   const onMarkerDragEnd = (event) => {
     setIsSearch((prev) => false);
-    const lat = event.latLng.lat();
-    const lng = event.latLng.lng();
+    const lat = parseFloat(event.latLng.lat());
+    const lng = parseFloat(event.latLng.lng());
     setSelected({
       lat,
       lng,
@@ -100,8 +93,8 @@ function Map({ dark, setDark, sideBar, setSideBar }) {
   };
   const handleMapOnClick = (event) => {
     console.log(event);
-    const lat = event.latLng.lat();
-    const lng = event.latLng.lng();
+    const lat = parseFloat(event.latLng.lat());
+    const lng = parseFloat(event.latLng.lng());
     setIsSearch(false);
     setSelected({ lat, lng });
     dispatch(setSelectedLocation({ lat, lng }));
@@ -132,8 +125,23 @@ function Map({ dark, setDark, sideBar, setSideBar }) {
       <div onContextMenu={handleContextMenu} style={{ cursor: "context-menu" }}>
         <SideBar />
         <div className={styles.placesContainer}>
-          {!selected && <p>Look for a place to clean</p>}
           {directions && <Distance leg={directions.routes[0].legs[0]} />}
+          {hasError && (
+            <Fade
+              in={hasError} //Write the needed condition here to make it appear
+              timeout={{ enter: 1000, exit: 1000 }} //Edit these two values to change the duration of transition when the element is getting appeared and disappeard
+              addEndListener={() => {
+                setTimeout(() => {
+                  dispatch(setHasError(false));
+                }, 2000);
+              }}
+            >
+              <Alert severity="warning" variant="standard" className="alert">
+                <AlertTitle>Fail</AlertTitle>
+                Please login or create an accont to save locations
+              </Alert>
+            </Fade>
+          )}
           {locationSavedSuccess && (
             <Fade
               in={locationSavedSuccess} //Write the needed condition here to make it appear
@@ -150,12 +158,15 @@ function Map({ dark, setDark, sideBar, setSideBar }) {
               </Alert>
             </Fade>
           )}
+
           {selected && (
-            <Combobox>
-              <ComboboxButton onClick={() => addLocation()}>
-                Save Location
-              </ComboboxButton>
-            </Combobox>
+            <Button
+              variant="contained"
+              endIcon={<LocationOn />}
+              onClick={() => addLocation()}
+            >
+              Save Location
+            </Button>
           )}
           <PlacesAutocomplete
             setSelected={(pos) => {

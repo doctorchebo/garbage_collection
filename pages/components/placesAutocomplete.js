@@ -35,7 +35,7 @@ const PlacesAutocomplete = ({ setSelected }) => {
         onChange={(e) => setValue(e.target.value)}
         disabled={!ready}
         className={styles.comboboxInput}
-        placeholder="Search for a location"
+        placeholder="Search for a location to clean"
       />
       <ComboboxPopover>
         <ComboboxList>

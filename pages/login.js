@@ -1,5 +1,7 @@
 import {
+  Box,
   Button,
+  CircularProgress,
   FormHelperText,
   IconButton,
   InputAdornment,
@@ -22,7 +24,7 @@ import { setError } from "../app/auth/authSlice";
 const Login = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const { user, error } = useSelector((state) => state.auth);
+  const { user, error, loading, isAuth } = useSelector((state) => state.auth);
   console.log("error: " + error);
   const schema = object().shape({
     email: string().email().required("Email is required"),
@@ -45,10 +47,10 @@ const Login = () => {
   });
 
   useEffect(() => {
-    if (user.length) {
+    if (isAuth) {
       router.push("/");
     }
-  }, [user, router]);
+  }, [isAuth, loading, router]);
 
   useEffect(() => {
     dispatch(setError(false));
@@ -58,7 +60,7 @@ const Login = () => {
     dispatch(login(data));
   };
 
-  return (
+  return !loading ? (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.loginForm}>
       <TextField
         className={styles.inpuField}
@@ -108,6 +110,11 @@ const Login = () => {
         <div className={styles.error}>Incorrect email and/or password</div>
       )}
     </form>
+  ) : (
+    <Box className={styles.spinnerBox}>
+      <CircularProgress />
+      <h2>Loading</h2>
+    </Box>
   );
 };
 

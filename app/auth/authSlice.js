@@ -7,6 +7,8 @@ const authState = {
   isSignup: false,
   loading: false,
   loginSuccess: false,
+  hasError: false,
+  isAuth: false,
 };
 
 export const authSlice = createSlice({
@@ -21,8 +23,11 @@ export const authSlice = createSlice({
       state.error = action.payload;
       console.log("Setting Error: " + state.error);
     },
+    setHasError: (state, action) => {
+      state.hasError = action.payload;
+    },
     setLoading: (state, action) => {
-      state.error = action.payload;
+      state.loading = action.payload;
       console.log("Loading " + state.error);
     },
     loadUser: (state, action) => {
@@ -40,6 +45,9 @@ export const authSlice = createSlice({
     setLoginSuccess: (state, action) => {
       state.loginSuccess = action.payload;
     },
+    setIsAuth: (state, action) => {
+      state.isAuth = action.payload;
+    },
   },
 });
 
@@ -47,11 +55,13 @@ export const authSlice = createSlice({
 export const {
   setToken,
   setError,
+  setHasError,
   setLoading,
   loadUser,
   logout,
   setSignup,
   setLoginSuccess,
+  setIsAuth,
 } = authSlice.actions;
 
 // this is for configureStore

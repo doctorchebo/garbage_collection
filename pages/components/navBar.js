@@ -16,6 +16,7 @@ import { setDarkMode, setSideBar } from "../../app/ui/uiSlice";
 import logo from "../../public/logo.jpg";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import useAuth from "../../app/hooks/useAuth";
 
 export default function NavBar({ dark, setDark }) {
   const user = useSelector((state) => state.auth.user);
@@ -23,11 +24,8 @@ export default function NavBar({ dark, setDark }) {
   const dispatch = useDispatch();
   const sideBar = useSelector((state) => state.ui.sideBar);
   console.log("sidebar: " + sideBar);
-  const [token, setToken] = useState(null);
-  useEffect(() => {
-    const token = localStorage.getItem("userDetails") != null ? true : false;
-    setToken(token);
-  }, []);
+  const { isAuth } = useAuth();
+  console.log("isAuth: " + JSON.stringify(isAuth));
 
   const handleDarkModeOnchange = () => {
     setDark((prev) => !prev);
@@ -48,11 +46,7 @@ export default function NavBar({ dark, setDark }) {
             <MenuIcon />
           </IconButton>
           <Box className={styles.logo}>
-            <Image
-              src={logo}
-              alt="logo"
-              onClick={() => router.push("/")}
-            />
+            <Image src={logo} alt="logo" onClick={() => router.push("/")} />
           </Box>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Clean City
@@ -70,7 +64,7 @@ export default function NavBar({ dark, setDark }) {
               label={dark ? "dark" : "light"}
             />
           </FormGroup>
-          {token ? (
+          {isAuth ? (
             <Link href="/logout">
               <a>Logout</a>
             </Link>

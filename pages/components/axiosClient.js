@@ -1,4 +1,5 @@
 import axios from "axios";
+import { setError, setHasError } from "../../app/auth/authSlice";
 const baseUrl = "http://127.0.0.1:8000";
 
 export const locationsAPI = axios.create({
@@ -31,18 +32,24 @@ locationsAPI.interceptors.response.use(
         );
         config.sent = true;
         const userDetails = JSON.parse(localStorage.getItem("userDetails"));
-        return AxiosService.authAPI()
-          .post("token/refresh/", userDetails.refresh)
-          .then((res) => {
-            config.headers["Authorization"] = `Bearer ${res.access}`;
-            localStorage.setItem("userDetails", res.access);
-            console.log("new access token was saved");
-            return axios(config);
-          })
-          .catch((error) => {
-            Promise.reject(error);
-            removeTokens();
-          });
+        if (userDetails != null) {
+          return async (dispatch) => {
+            return authAPI
+              .post("token/refresh/", userDetails.refresh)
+              .then((res) => {
+                config.headers["Authorization"] = `Bearer ${res.access}`;
+                localStorage.setItem("userDetails", res.access);
+                console.log("new access token was saved");
+                return axios(config);
+              })
+              .catch((error) => {
+                dispatch(setError(error));
+                dispatch(setHasError(true));
+                Promise.reject(error);
+                removeTokens();
+              });
+          };
+        }
       } else if (error.response.status === 403) {
       }
     }
