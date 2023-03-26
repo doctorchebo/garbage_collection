@@ -2,9 +2,11 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const locationState = {
   locations: [],
+  name: {},
   selectedLocation: [],
   saveLocationSuccess: false,
   saveLocationFailure: false,
+  myLocations: [],
 };
 
 export const locationSlice = createSlice({
@@ -23,6 +25,18 @@ export const locationSlice = createSlice({
     setSaveLocationFailure: (state, action) => {
       state.saveLocationFailure = action.payload;
     },
+    setName: (state, action) => {
+      let results = action.payload;
+      for (let i = 0; i < results.length; i++) {
+        if (!results[i].formatted_address.includes("GV")) {
+          state.name = results[i].formatted_address;
+          break;
+        }
+      }
+    },
+    setMyLocations: (state, action) => {
+      state.myLocations = action.payload;
+    },
   },
 });
 
@@ -32,6 +46,8 @@ export const {
   setSelectedLocation,
   setSaveLocationSuccess,
   setSaveLocationFailure,
+  setName,
+  setMyLocations,
 } = locationSlice.actions;
 
 // this is for configureStore

@@ -23,21 +23,34 @@ import { useDispatch, useSelector } from "react-redux";
 import { saveLocation } from "../../app/location/locationActions";
 import {
   setSaveLocationSuccess,
+  setName,
   setSelectedLocation,
 } from "../../app/location/locationSlice";
 import { setError, setHasError } from "../../app/auth/authSlice";
 import { LocationOn } from "@mui/icons-material";
+import useGeocoder from "./geocoder";
 function Map({ dark, setDark, sideBar, setSideBar }) {
   const [libraries] = useState(["places"]);
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_API_KEY,
     libraries,
   });
+  const [geocoder, setGeocoder] = useState(null);
+  useEffect(() => {
+    if (isLoaded) {
+      const gc = new window.google.maps.Geocoder();
+      setGeocoder(gc);
+    }
+  }, [isLoaded]);
+
   const hasError = useSelector((state) => state.auth.hasError);
-  const locationSavedSuccess = useSelector(
-    (state) => state.locations.saveLocationSuccess
+  const { locationSavedSuccess, name } = useSelector(
+    (state) => state.locations
   );
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState({
+    lat: -16.499593804390177,
+    lng: -68.12269880408721,
+  });
   const [directions, setDirections] = useState(null);
   const [saveButton, setSaveButton] = useState(false);
   const [locations, setLocations] = useState([]);
@@ -45,7 +58,7 @@ function Map({ dark, setDark, sideBar, setSideBar }) {
   const [open, setOpen] = useState(false);
   const [contextMenu, setContextMenu] = useState(null);
   const dispatch = useDispatch();
-  console.log(locations);
+  console.log("selected address: " + JSON.stringify(name, null, 2));
   const randomLocations = useMemo(
     () => generateLocations(selected),
     [selected]
@@ -62,14 +75,27 @@ function Map({ dark, setDark, sideBar, setSideBar }) {
   const mapRef = useRef();
   const onLoad = useCallback((map) => (mapRef.current = map), []);
   const onMarkerDragEnd = (event) => {
-    setIsSearch((prev) => false);
+    setIsSearch(false);
     const lat = parseFloat(event.latLng.lat());
     const lng = parseFloat(event.latLng.lng());
-    setSelected({
-      lat,
-      lng,
-    });
-    dispatch(setSelectedLocation({ lat, lng }));
+    setSelected({ lat, lng });
+    getAddress(selected);
+  };
+
+  const getAddress = (location) => {
+    geocoder
+      .geocode({ location: location })
+      .then((response) => {
+        if (response.results[0]) {
+          dispatch(setName(response.results));
+        } else {
+          window.alert("No results found");
+        }
+      })
+      .then(()=>{
+        dispatch(setSelectedLocation({ lat, lng, name }));
+      })
+      .catch((e) => console.log("Geocoder failed due to: " + e));
   };
   const getDirections = (house) => {
     const service = new google.maps.DirectionsService();
@@ -92,12 +118,11 @@ function Map({ dark, setDark, sideBar, setSideBar }) {
     setDirections();
   };
   const handleMapOnClick = (event) => {
-    console.log(event);
     const lat = parseFloat(event.latLng.lat());
     const lng = parseFloat(event.latLng.lng());
     setIsSearch(false);
     setSelected({ lat, lng });
-    dispatch(setSelectedLocation({ lat, lng }));
+    getAddress(selected);
     setSaveButton(true);
   };
 
